@@ -43,6 +43,8 @@ class DataPrep:
 
         self._control_predictors, self._control_outcome_before, self._control_outcome_after = self._get_control_data()
 
+        self._treated_predictors, self._control_predictors = self._rescale_predictors()
+
     def _get_treated_data(self):
         treated = self._data[self._data[self._id_variable]
                              == self._treated_unit]
@@ -85,7 +87,18 @@ class DataPrep:
             ]
         )
 
-        return control_predictors, control_outcome_before, control_outcome_after,
+        return control_predictors, control_outcome_before, control_outcome_after
+
+    def _rescale_predictors(self):
+        all_predictors = np.concatenate(
+            (self._treated_predictors, self._control_predictors), axis=1)
+        all_predictors /= np.apply_along_axis(np.std, 0, all_predictors)
+
+        # we know treated is in the first column since we concatenated it
+        treated_preds = all_predictors[:, 0]
+        control_preds = all_predictors[:, 1:]  # all other columns are control
+
+        return treated_preds, control_preds
 
 
 class SyntheticControl(DataPrep):
@@ -106,17 +119,10 @@ class SyntheticControl(DataPrep):
 
 if __name__ == "__main__":
     germany = pd.read_stata("repgermany.dta")
-    synth = SyntheticControl(
-        germany,
-        "gdp",
-        "country",
-        "year",
-        1990,
-        "West Germany",
-        drop_columns=["index"],
-    )
+    synth = SyntheticControl(germany, "gdp", "country",
+                             "year", 1990, "West Germany", drop_columns=["index"])
 
     # print(synth._treated_predictors)
-    # print(synth.treated_outcome_before)
-    # print(synth.control_predictors)
-    # print(synth.control_outcome_before)
+    # print(synth._treated_outcome_before)
+    # print(synth._control_predictors)
+    # print(synth._control_outcome_before)
