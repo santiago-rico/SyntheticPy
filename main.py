@@ -54,13 +54,13 @@ class DataPrep:
     def _process_data(self):
 
         (
-            self._treated_predictors,
+            self._unscaled_treated_predictors,
             self._treated_outcome_before,
             self._treated_outcome_after,
         ) = self._get_treated_data()
 
         (
-            self._control_predictors,
+            self._unscaled_control_predictors,
             self._control_outcome_before,
             self._control_outcome_after,
         ) = self._get_control_data()
@@ -154,7 +154,11 @@ class DataPrep:
 
     def _rescale_predictors(self):
         all_predictors = np.concatenate(
-            (self._treated_predictors, self._control_predictors), axis=1
+            (
+                self._unscaled_treated_predictors,
+                self._unscaled_control_predictors,
+            ),
+            axis=1,
         )
         all_predictors /= np.apply_along_axis(np.std, 0, all_predictors)
 
@@ -213,6 +217,7 @@ if __name__ == "__main__":
     )
 
     print(synth.get_weights_table())
+    print(synth.get_predictor_comparison())
     # print(synth._treated_outcome_before)
     # print(synth._control_predictors)
     # print(synth._control_outcome_before)

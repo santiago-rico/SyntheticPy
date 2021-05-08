@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import fmin_slsqp, basinhopping
+from scipy.optimize import fmin_slsqp, basinhopping, minimize
 
 
 class Solver:
@@ -78,6 +78,7 @@ class Solver:
             bounds=[(0.0, 1.0)] * len(weights0),
             args=(v0, treated_predictors, control_predictors),
             disp=False,
+            acc=1.0e-08,
         )
         loss = self._v_target_func(weights, treated_outcome, control_outcome)
         return loss
@@ -108,6 +109,20 @@ class Solver:
                 bounds=[(0.0, 1.0)] * len(v0),
             ),
         )
+        # result = minimize(
+        #     self._get_v_loss,
+        #     v0,
+        #     args=(
+        #         weights0,
+        #         treated_predictors,
+        #         control_predictors,
+        #         treated_outcome,
+        #         control_outcome,
+        #     ),
+        #     bounds=[(0.0, 1.0)] * len(v0),
+        #     tol=1e-8,
+        # )
+
         v_star = result["x"]
         return v_star
 
@@ -121,6 +136,7 @@ class Solver:
             bounds=[(0.0, 1.0)] * len(weights0),
             args=(v_star, treated_predictors, control_predictors),
             disp=False,
+            acc=1.0e-08,
         )
 
         return weights_star
