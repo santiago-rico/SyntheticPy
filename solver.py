@@ -95,6 +95,7 @@ class Solver:
             self._get_v_loss,
             v0,
             niter=10,
+            seed=2021,
             minimizer_kwargs=dict(
                 method="L-BFGS-B",
                 args=(

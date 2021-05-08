@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from solver import Solver
+from tables import SynthTables
 
 
 class DataPrep:
@@ -39,6 +40,9 @@ class DataPrep:
         self._num_control_units = data[data[id_variable] != treated_unit][
             id_variable
         ].nunique()
+        self._control_units = data[data[id_variable] != treated_unit][
+            id_variable
+        ].unique()
 
         self._treated_predictors = None
         self._control_predictors = None
@@ -161,7 +165,7 @@ class DataPrep:
         return treated_preds, control_preds
 
 
-class SyntheticControl(DataPrep, Solver):
+class SyntheticControl(DataPrep, Solver, SynthTables):
     def __init__(
         self,
         data,
@@ -185,8 +189,8 @@ class SyntheticControl(DataPrep, Solver):
 
         (
             self.treated_outcome_estimate,
-            self.predictors_importance,
-            self.control_unit_weights,
+            self._predictors_importance,
+            self._control_weights,
         ) = self.estimate(
             self._treated_predictors,
             self._control_predictors,
@@ -208,8 +212,7 @@ if __name__ == "__main__":
         drop_columns=["index"],
     )
 
-    print(synth.predictors_importance)
-    print(np.around(synth.control_unit_weights, 2))
+    print(synth.get_weights_table())
     # print(synth._treated_outcome_before)
     # print(synth._control_predictors)
     # print(synth._control_outcome_before)
