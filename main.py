@@ -183,7 +183,11 @@ class SyntheticControl(DataPrep, Solver):
         )
         self._process_data()
 
-        estimates, predictors, controls = self.estimate(
+        (
+            self.treated_outcome_estimate,
+            self.predictors_importance,
+            self.control_unit_weights,
+        ) = self.estimate(
             self._treated_predictors,
             self._control_predictors,
             self._treated_outcome_before,
@@ -204,7 +208,8 @@ if __name__ == "__main__":
         drop_columns=["index"],
     )
 
-    # print(synth._treated_predictors)
+    print(synth.predictors_importance)
+    print(np.around(synth.control_unit_weights, 2))
     # print(synth._treated_outcome_before)
     # print(synth._control_predictors)
     # print(synth._control_outcome_before)

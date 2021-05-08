@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import fmin_slsqp, minimize
+from scipy.optimize import fmin_slsqp, basinhopping
 
 
 class Solver:
@@ -91,18 +91,21 @@ class Solver:
         treated_outcome,
         control_outcome,
     ):
-        result = minimize(
+        result = basinhopping(
             self._get_v_loss,
             v0,
-            args=(
-                weights0,
-                treated_predictors,
-                control_predictors,
-                treated_outcome,
-                control_outcome,
+            niter=10,
+            minimizer_kwargs=dict(
+                method="L-BFGS-B",
+                args=(
+                    weights0,
+                    treated_predictors,
+                    control_predictors,
+                    treated_outcome,
+                    control_outcome,
+                ),
+                bounds=[(0.0, 1.0)] * len(v0),
             ),
-            method="L-BFGS-B",
-            bounds=[(0.0, 1.0)] * len(v0),
         )
         v_star = result["x"]
         return v_star
