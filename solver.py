@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import fmin_slsqp, basinhopping, minimize
+from scipy.optimize import fmin_slsqp, basinhopping
 
 
 class Solver:
@@ -10,6 +10,7 @@ class Solver:
         treated_outcome,
         control_outcome,
         control_outcome_after,
+        custom_v,
     ):
         num_predictors, num_control_units = (
             control_predictors.shape[0],
@@ -17,14 +18,19 @@ class Solver:
         )
         v0 = [1.0 / num_predictors] * num_predictors
         w0 = np.array([1.0 / num_control_units] * num_control_units)
-        predictors_importance = self._get_v_star(
-            v0,
-            w0,
-            treated_predictors,
-            control_predictors,
-            treated_outcome,
-            control_outcome,
-        )
+
+        predictors_importance = custom_v
+
+        if len(custom_v) == 0:
+            predictors_importance = self._get_v_star(
+                v0,
+                w0,
+                treated_predictors,
+                control_predictors,
+                treated_outcome,
+                control_outcome,
+            )
+
         control_unit_weights = self._get_weights_star(
             w0, predictors_importance, treated_predictors, control_predictors
         )

@@ -179,6 +179,7 @@ class SyntheticControl(DataPrep, Solver, SynthTables):
         time_of_treatment,
         treated_unit,
         drop_columns=[],
+        custom_v=[],
     ):
         super().__init__(
             data,
@@ -190,6 +191,7 @@ class SyntheticControl(DataPrep, Solver, SynthTables):
             drop_columns,
         )
         self._process_data()
+        self._custom_v = custom_v
 
         (
             self.treated_outcome_estimate,
@@ -201,6 +203,7 @@ class SyntheticControl(DataPrep, Solver, SynthTables):
             self._treated_outcome_before,
             self._control_outcome_before,
             self._control_outcome_after,
+            self._custom_v
         )
 
 
@@ -214,10 +217,20 @@ if __name__ == "__main__":
         1990,
         "West Germany",
         drop_columns=["index"],
+        # custom_v=[
+        #     0.02330873,
+        #     0.3640076,
+        #     0.01755632,
+        #     0.0641354,
+        #     0.3532059,
+        #     0.1709646,
+        #     0.006821504,
+        # ],
     )
 
     print(synth.get_weights_table())
     print(synth.get_predictor_comparison())
+    print(synth._predictors_importance)
     # print(synth._treated_outcome_before)
     # print(synth._control_predictors)
     # print(synth._control_outcome_before)
