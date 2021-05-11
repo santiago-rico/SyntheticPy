@@ -22,6 +22,47 @@ class DataPrep:
         self._time_of_treatment = time_of_treatment
         self._treated_unit = treated_unit
 
+        # Basic checks
+        if not isinstance(self._data, pd.DataFrame):
+            raise TypeError("data argument is not a pandas DataFrame")
+
+        if not isinstance(self._outcome_variable, str):
+            raise TypeError("outcome_variable argument is not a string")
+
+        if self._outcome_variable not in self._data.columns:
+            raise KeyError(
+                f"{outcome_variable} is not a column of the dataset"
+            )
+
+        if not isinstance(self._id_variable, str):
+            raise TypeError("id_variable argument is not a string")
+
+        if self._id_variable not in self._data.columns:
+            raise KeyError(f"{id_variable} is not a column of the dataset")
+
+        if self._treated_unit not in self._data[self._id_variable].unique():
+            raise Exception(
+                f"treated_unit argument not found in the {id_variable} column"
+            )
+
+        non_found_drop = [
+            col for col in drop_columns if col not in self._data.columns
+        ]
+        if len(non_found_drop) > 0:
+            raise Exception(
+                f"{','.join(non_found_drop)} not found in dataset columns"
+            )
+
+        # SyntheticControl(
+        # [1, 2, 3],
+        # # germany,
+        # "gdp",
+        # "country",
+        # "year",
+        # 1990,
+        # "West Germany",
+        # drop_columns=["index"]
+
         self._cols_to_drop = [
             outcome_variable,
             id_variable,
@@ -190,6 +231,7 @@ class SyntheticControl(DataPrep, Solver, SynthTables):
             treated_unit,
             drop_columns,
         )
+
         self._process_data()
         self._custom_v = custom_v
 
@@ -203,7 +245,7 @@ class SyntheticControl(DataPrep, Solver, SynthTables):
             self._treated_outcome_before,
             self._control_outcome_before,
             self._control_outcome_after,
-            self._custom_v
+            self._custom_v,
         )
 
 
